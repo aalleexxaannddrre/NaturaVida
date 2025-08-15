@@ -1,0 +1,939 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NaturaVida - Sua Loja de Produtos Naturais</title>
+
+    <!-- Importando o framework Bootstrap para um design moderno e responsivo -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+
+    <!-- Estilos personalizados -->
+    <style>
+        :root {
+            --primary-color: #2E7D32; /* Verde escuro, cor principal */
+            --secondary-color: #66BB6A; /* Verde mais claro */
+            --text-color: #333;
+            --background-light: #F1F8E9; /* Verde bem clarinho */
+        }
+        body {
+            font-family: 'Inter', sans-serif;
+            color: var(--text-color);
+        }
+        .navbar-brand {
+            font-weight: 700;
+            font-size: 1.5rem;
+            color: var(--primary-color) !important;
+        }
+        .nav-link {
+            font-weight: 500;
+            cursor: pointer; /* Muda o cursor para indicar que é clicável */
+        }
+        .nav-link.active, .nav-link:hover {
+            color: var(--primary-color) !important;
+        }
+        .btn-success {
+            background-color: var(--primary-color);
+            border-color: var(--primary-color);
+            border-radius: 50px;
+            padding: 10px 25px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+        .btn-success:hover {
+            background-color: var(--secondary-color);
+            border-color: var(--secondary-color);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+        }
+        .hero-section {
+            background-color: var(--background-light);
+            padding: 5rem 2rem;
+            border-radius: 15px;
+        }
+        .card {
+            border: none;
+            border-radius: 15px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+            transition: transform .3s ease, box-shadow .3s ease;
+        }
+        .card:hover {
+            transform: scale(1.03);
+            box-shadow: 0 6px 25px rgba(46, 125, 50, 0.15);
+        }
+        .card-title {
+            color: var(--primary-color);
+            font-weight: 600;
+        }
+        .card-img-top {
+            border-top-left-radius: 15px;
+            border-top-right-radius: 15px;
+            height: 200px;
+            object-fit: cover;
+        }
+        footer {
+            background-color: #FAFAFA;
+        }
+        /* Classe para esconder as páginas que não estão ativas */
+        .page-content {
+            display: none;
+        }
+        /* Estilo para os controles de quantidade no carrinho */
+        .quantity-controls button {
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            line-height: 1;
+        }
+        /* Estilos para o modo Admin */
+        .admin-panel {
+            display: none; /* Esconde por padrão */
+        }
+        body.admin-mode .admin-panel {
+            display: block; /* Mostra quando o body tem a classe admin-mode */
+        }
+        .recipe-content ul, .recipe-content ol {
+            padding-left: 20px;
+        }
+        .recipe-content li {
+            margin-bottom: 0.5rem;
+        }
+        /* Estilos para o login do usuário */
+        #user-info img {
+            width: 32px;
+            height: 32px;
+        }
+    </style>
+    <!-- Importando a fonte Inter do Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body class="bg-light">
+
+    <!-- 1. Cabeçalho com Navegação -->
+    <header>
+        <nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm sticky-top">
+            <div class="container">
+                <a class="navbar-brand" href="#" id="nav-brand">
+                    <i class="bi bi-leaf-fill"></i>
+                    NaturaVida
+                </a>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="collapse navbar-collapse" id="navbarNav">
+                    <ul class="navbar-nav mx-auto">
+                        <li class="nav-item"><a class="nav-link active" data-page="inicio">Início</a></li>
+                        <li class="nav-item"><a class="nav-link" data-page="produtos">Produtos</a></li>
+                        <li class="nav-item"><a class="nav-link" data-page="receitas">Receitas</a></li>
+                        <li class="nav-item"><a class="nav-link" data-page="sobre">Sobre Nós</a></li>
+                        <li class="nav-item"><a class="nav-link" data-page="contato">Contato</a></li>
+                    </ul>
+                    <div class="d-flex align-items-center">
+                        <!-- ÁREA DE LOGIN DO CLIENTE -->
+                        <div id="auth-container">
+                            <a id="login-button" href="#" class="nav-link me-3">
+                                <i class="bi bi-person-circle fs-4"></i>
+                            </a>
+                            <div id="user-info" class="d-none align-items-center">
+                                <img id="user-photo" src="" alt="Foto do usuário" class="me-2 rounded-circle">
+                                <button id="logout-button" class="btn btn-sm btn-outline-danger">Sair</button>
+                            </div>
+                        </div>
+                        <!-- FIM DA ÁREA DE LOGIN -->
+                        <a href="#" class="btn btn-outline-success position-relative" data-page="carrinho">
+                            <i class="bi bi-cart-fill"></i> Carrinho 
+                            <span id="cart-badge" class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+                                0
+                            </span>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <!-- 2. Conteúdo Principal -->
+    <main class="container my-5">
+
+        <!-- PÁGINA: INÍCIO -->
+        <div id="page-inicio" class="page-content" style="display: block;">
+            <section class="hero-section text-center mb-5">
+                <h1 class="display-4 fw-bold">Viva uma vida mais saudável e natural</h1>
+                <p class="lead text-muted my-4">Os melhores produtos orgânicos, suplementos e alimentos funcionais, direto para sua casa.</p>
+                <a href="#" class="btn btn-success btn-lg" id="hero-offers-btn">Ver Todas as Ofertas</a>
+            </section>
+            <section>
+                <h2 class="text-center mb-5">Nossos Produtos em Destaque</h2>
+                <div id="featured-products-container" class="row row-cols-1 row-cols-md-2 row-cols-lg-4 g-4">
+                    <!-- Produtos em destaque serão inseridos aqui -->
+                </div>
+            </section>
+        </div>
+
+        <!-- PÁGINA: PRODUTOS -->
+        <div id="page-produtos" class="page-content">
+            <div class="admin-panel bg-light border rounded p-4 mb-5 text-center">
+                <h4><i class="bi bi-shield-lock-fill"></i> Painel do Administrador de Produtos</h4>
+                <p>Gerencie os produtos da sua loja.</p>
+                <button class="btn btn-primary" id="add-product-btn"><i class="bi bi-plus-circle-fill"></i> Adicionar Novo Produto</button>
+                <button class="btn btn-info" id="print-products-btn"><i class="bi bi-printer-fill"></i> Imprimir Lista de Produtos</button>
+            </div>
+            <h1 class="mb-4">Todos os Nossos Produtos</h1>
+            <div id="all-products-container" class="row row-cols-1 row-cols-md-2 row-cols-lg-4 g-4"></div>
+        </div>
+
+        <!-- PÁGINA: RECEITAS -->
+        <div id="page-receitas" class="page-content">
+            <div class="admin-panel bg-light border rounded p-4 mb-5 text-center">
+                <h4><i class="bi bi-shield-lock-fill"></i> Painel do Administrador de Receitas</h4>
+                <p>Gerencie as receitas da sua loja.</p>
+                <button class="btn btn-primary" id="add-recipe-btn"><i class="bi bi-journal-plus"></i> Adicionar Nova Receita</button>
+            </div>
+            <h1 class="mb-4">Receitas Saudáveis</h1>
+            <div id="all-recipes-container" class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4"></div>
+        </div>
+
+        <!-- PÁGINA: SOBRE NÓS -->
+        <div id="page-sobre" class="page-content">
+            <div class="admin-panel bg-light border rounded p-4 mb-5">
+                 <h4><i class="bi bi-pencil-fill"></i> Editar Página "Sobre Nós"</h4>
+                 <textarea id="about-editor" class="form-control" rows="10"></textarea>
+                 <button class="btn btn-primary mt-3" id="save-about-btn">Salvar Conteúdo</button>
+            </div>
+            <h1 class="mb-4">Sobre a NaturaVida</h1>
+            <div id="about-content" class="lead"></div>
+        </div>
+
+        <!-- PÁGINA: CONTATO -->
+        <div id="page-contato" class="page-content">
+            <div class="admin-panel bg-light border rounded p-4 mb-5">
+                 <h4><i class="bi bi-pencil-fill"></i> Editar Informações de Contato e Pix</h4>
+                 <form id="contact-form">
+                    <div class="mb-3">
+                        <label for="contact-email" class="form-label">E-mail de Contato</label>
+                        <input type="email" class="form-control" id="contact-email">
+                    </div>
+                    <div class="mb-3">
+                        <label for="contact-phone" class="form-label">Telefone de Contato</label>
+                        <input type="tel" class="form-control" id="contact-phone">
+                    </div>
+                     <div class="mb-3">
+                        <label for="contact-whatsapp" class="form-label">WhatsApp de Contato</label>
+                        <input type="tel" class="form-control" id="contact-whatsapp">
+                    </div>
+                     <div class="mb-3">
+                        <label for="contact-address" class="form-label">Endereço</label>
+                        <textarea class="form-control" id="contact-address" rows="3"></textarea>
+                    </div>
+                    <hr>
+                    <h5 class="mt-4">Configurações de Pagamento</h5>
+                    <div class="mb-3">
+                        <label for="contact-whatsapp-checkout" class="form-label fw-bold">WhatsApp para Envio de Comprovante</label>
+                        <input type="tel" class="form-control" id="contact-whatsapp-checkout" placeholder="Ex: 5521999998888" aria-describedby="whatsappHelp">
+                        <div id="whatsappHelp" class="form-text">Insira o número com código do país (55) e DDD.</div>
+                    </div>
+                    <div class="mb-3">
+                        <label for="contact-pix-qrcode" class="form-label fw-bold">URL da Imagem do QR Code Pix</label>
+                        <input type="text" class="form-control" id="contact-pix-qrcode" placeholder="https://i.imgur.com/seu-qrcode.png">
+                    </div>
+                    <div class="mb-3">
+                        <label for="contact-pix-key" class="form-label fw-bold">Chave Pix "Copia e Cola"</label>
+                        <textarea class="form-control" id="contact-pix-key" rows="3"></textarea>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Salvar Informações</button>
+                 </form>
+            </div>
+            <h1 class="mb-4">Fale Conosco</h1>
+            <div id="contact-info-display" class="fs-5"></div>
+        </div>
+
+        <!-- PÁGINA: CARRINHO -->
+        <div id="page-carrinho" class="page-content">
+            <h1 class="mb-4">Meu Carrinho de Compras</h1>
+            <div id="cart-items-container"></div>
+        </div>
+    </main>
+
+    <!-- 3. Rodapé -->
+    <footer class="pt-5 pb-4 mt-5 border-top bg-white">
+        <div class="container text-center">
+            <p class="text-muted">&copy; 2025 NaturaVida. Todos os direitos reservados.</p>
+            <button id="admin-mode-btn" class="btn btn-sm btn-outline-secondary mt-2">
+                <i class="bi bi-shield-lock"></i> Acessar Modo Admin
+            </button>
+        </div>
+    </footer>
+
+    <!-- MODAIS -->
+    <div class="modal fade" id="productModal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header"><h5 class="modal-title" id="productModalLabel"></h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div>
+                <div class="modal-body">
+                    <form id="product-form">
+                        <input type="hidden" id="editProductId">
+                        <div class="mb-3"><label for="productName" class="form-label">Nome do Produto</label><input type="text" class="form-control" id="productName" required></div>
+                        <div class="row">
+                            <div class="col-md-4 mb-3"><label for="productPrice" class="form-label">Preço (R$)</label><input type="number" step="0.01" class="form-control" id="productPrice" required></div>
+                            <div class="col-md-4 mb-3"><label for="productQuantityValue" class="form-label">Quantidade</label><input type="number" class="form-control" id="productQuantityValue" placeholder="Ex: 100" required></div>
+                            <div class="col-md-4 mb-3"><label for="productUnit" class="form-label">Unidade</label><select class="form-select" id="productUnit" required><option value="gr">gr</option><option value="kg">kg</option><option value="ml">ml</option><option value="l">l</option><option value="un">un</option></select></div>
+                        </div>
+                        <div class="mb-3"><label for="productImage" class="form-label">URL da Imagem</label><input type="text" class="form-control" id="productImage" placeholder="https://placehold.co/400x300/..."></div>
+                        <div class="mb-3"><label for="productDesc" class="form-label">Descrição</label><textarea class="form-control" id="productDesc" rows="3"></textarea></div>
+                    </form>
+                </div>
+                <div class="modal-footer"><button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button><button type="submit" class="btn btn-primary" form="product-form">Salvar Produto</button></div>
+            </div>
+        </div>
+    </div>
+    <div class="modal fade" id="recipeModal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header"><h5 class="modal-title" id="recipeModalLabel"></h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div>
+                <div class="modal-body">
+                    <form id="recipe-form">
+                        <input type="hidden" id="editRecipeId">
+                        <div class="mb-3"><label for="recipeName" class="form-label">Nome da Receita</label><input type="text" class="form-control" id="recipeName" required></div>
+                        <div class="mb-3"><label for="recipeImage" class="form-label">URL da Imagem</label><input type="text" class="form-control" id="recipeImage" placeholder="https://placehold.co/400x300/..."></div>
+                        <div class="mb-3"><label for="recipeIngredients" class="form-label">Ingredientes (um por linha)</label><textarea class="form-control" id="recipeIngredients" rows="5"></textarea></div>
+                        <div class="mb-3"><label for="recipeInstructions" class="form-label">Modo de Preparo (um passo por linha)</label><textarea class="form-control" id="recipeInstructions" rows="7"></textarea></div>
+                    </form>
+                </div>
+                <div class="modal-footer"><button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button><button type="submit" class="btn btn-primary" form="recipe-form">Salvar Receita</button></div>
+            </div>
+        </div>
+    </div>
+    <div class="modal fade" id="viewRecipeModal" tabindex="-1">
+        <div class="modal-dialog modal-lg modal-dialog-scrollable">
+            <div class="modal-content">
+                <div class="modal-header"><h5 class="modal-title" id="viewRecipeModalLabel"></h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div>
+                <div class="modal-body" id="viewRecipeModalBody"></div>
+                <div class="modal-footer"><button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fechar</button></div>
+            </div>
+        </div>
+    </div>
+    <div class="toast-container position-fixed bottom-0 end-0 p-3">
+        <div id="liveToast" class="toast" role="alert" aria-live="assertive" aria-atomic="true">
+            <div class="toast-header bg-success text-white"><strong class="me-auto"><i class="bi bi-check-circle-fill"></i> Sucesso!</strong><button type="button" class="btn-close btn-close-white" data-bs-dismiss="toast"></button></div>
+            <div class="toast-body" id="toast-body-message"></div>
+        </div>
+    </div>
+    <div class="modal fade" id="deleteConfirmModal" tabindex="-1">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header"><h5 class="modal-title" id="deleteConfirmModalLabel"></h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div>
+          <div class="modal-body"><p id="deleteConfirmModalBody"></p></div>
+          <div class="modal-footer"><button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button><button type="button" class="btn btn-danger" id="confirmDeleteBtn">Excluir</button></div>
+        </div>
+      </div>
+    </div>
+    <div class="modal fade" id="passwordModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Acesso Restrito</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="password-form">
+                        <div class="mb-3">
+                            <label for="admin-password" class="form-label">Por favor, insira a senha de administrador:</label>
+                            <input type="password" class="form-control" id="admin-password" required>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-primary" form="password-form">Entrar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal fade" id="pixModal" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Pagamento via Pix</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body text-center">
+                    <p>Para finalizar, faça o pagamento do valor total de <strong id="pix-total-value"></strong>.</p>
+                    <p class="text-muted small">1. Escaneie o QR Code abaixo com o app do seu banco:</p>
+                    <img id="pix-qrcode-img" src="" class="img-fluid rounded mb-3" alt="QR Code Pix" style="max-width: 250px;" onerror="this.onerror=null;this.src='https://placehold.co/250x250/eee/333?text=URL+Inválida';">
+                    <p class="fw-bold">2. Se preferir, copie o código abaixo e cole no seu app:</p>
+                    <div class="input-group mb-3">
+                        <input type="text" id="pix-key-text" class="form-control" readonly>
+                        <button class="btn btn-outline-secondary" type="button" id="copy-pix-btn"><i class="bi bi-clipboard-check"></i> Copiar Código</button>
+                    </div>
+                    <hr>
+                    <p class="mt-3 fw-bold">3. Tudo pronto? Envie o comprovante!</p>
+                    <p class="text-muted small">Após o pagamento, clique no botão para nos enviar o comprovante via WhatsApp.</p>
+                    <button class="btn btn-success" id="send-proof-btn"><i class="bi bi-whatsapp"></i> Enviar Comprovante</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal fade" id="quantityModal" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="quantityModalLabel"></h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="quantity-form">
+                        <input type="hidden" id="quantityProductId">
+                        <h6 id="quantityProductName"></h6>
+                        <p id="quantityProductPriceInfo" class="text-muted"></p>
+                        <div class="mb-3">
+                            <label for="product-quantity" class="form-label" id="quantityInputLabel"></label>
+                            <div class="input-group">
+                                <input type="number" class="form-control" id="product-quantity" required min="1" step="1">
+                                <span class="input-group-text" id="quantityUnitLabel"></span>
+                            </div>
+                        </div>
+                        <div class="text-end fs-5">
+                            <strong>Subtotal: <span id="quantitySubtotal">R$ 0,00</span></strong>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-primary" form="quantity-form">Confirmar e Adicionar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts do Supabase e Bootstrap -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- Scripts da Loja -->
+    <script>
+        // --- CONFIGURAÇÃO DO SUPABASE ---
+        const SUPABASE_URL = 'https://abdfwzcksfbscvhigwiv.supabase.co';
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFiZGZ3emNrc2Zic2N2aGlnd2l2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTUyMTIwNDMsImV4cCI6MjA3MDc4ODA0M30.AogmATEttAXQefAXHnJfyEF-e78RSF_EhELNE6ZvXN0';
+
+        // --- VARIÁVEIS GLOBAIS ---
+        const ADMIN_PASSWORD = 'admin123';
+        let supabaseClient;
+        let cart = [];
+        let products = [];
+        let recipes = [];
+        let aboutContent = '';
+        let contactInfo = {};
+        let productModal, recipeModal, viewRecipeModal, passwordModal, pixModal, quantityModal; 
+
+        // --- OBJETO PRINCIPAL DA APLICAÇÃO ---
+        const app = {
+            // --- INICIALIZAÇÃO ---
+            async init() {
+                // Modais
+                productModal = new bootstrap.Modal(document.getElementById('productModal'));
+                recipeModal = new bootstrap.Modal(document.getElementById('recipeModal'));
+                viewRecipeModal = new bootstrap.Modal(document.getElementById('viewRecipeModal'));
+                passwordModal = new bootstrap.Modal(document.getElementById('passwordModal'));
+                pixModal = new bootstrap.Modal(document.getElementById('pixModal'));
+                quantityModal = new bootstrap.Modal(document.getElementById('quantityModal'));
+                
+                // Conexão com Supabase
+                if (SUPABASE_URL === 'SUA_URL_AQUI' || SUPABASE_ANON_KEY === 'SUA_CHAVE_ANON_AQUI') {
+                    app.showToast('ATENÇÃO: Supabase não configurado. Os dados não serão salvos.');
+                } else {
+                    supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+                    app.setupAuthObserver();
+                    await app.loadData();
+                }
+
+                // Event Listeners
+                app.addEventListeners();
+
+                // Estado inicial
+                app.checkAdminMode(); 
+                app.renderAll();
+                app.updateAndSaveCart();
+            },
+
+            addEventListeners() {
+                // Navegação
+                document.querySelectorAll('.nav-link, .navbar-brand, .btn-outline-success, #hero-offers-btn').forEach(el => {
+                    el.addEventListener('click', (e) => {
+                        e.preventDefault();
+                        const page = el.dataset.page || (el.id === 'nav-brand' ? 'inicio' : null) || (el.id === 'hero-offers-btn' ? 'produtos' : null);
+                        if(page) app.showPage(page, el.classList.contains('nav-link') ? el : null);
+                    });
+                });
+                
+                // Formulários
+                document.getElementById('product-form').addEventListener('submit', app.handleProductFormSubmit);
+                document.getElementById('recipe-form').addEventListener('submit', app.handleRecipeFormSubmit);
+                document.getElementById('contact-form').addEventListener('submit', app.handleContactFormSubmit);
+                document.getElementById('quantity-form').addEventListener('submit', app.handleQuantityFormSubmit);
+                document.getElementById('password-form').addEventListener('submit', app.handlePasswordFormSubmit);
+
+                // Botões
+                document.getElementById('add-product-btn').addEventListener('click', () => app.openProductModal());
+                document.getElementById('print-products-btn').addEventListener('click', app.printProducts);
+                document.getElementById('add-recipe-btn').addEventListener('click', () => app.openRecipeModal());
+                document.getElementById('save-about-btn').addEventListener('click', app.saveAboutContent);
+                document.getElementById('admin-mode-btn').addEventListener('click', app.handleAdminModeClick);
+                document.getElementById('login-button').addEventListener('click', app.signInWithGoogle);
+                document.getElementById('logout-button').addEventListener('click', app.signOut);
+                document.getElementById('copy-pix-btn').addEventListener('click', app.copyPixKey);
+                document.getElementById('send-proof-btn').addEventListener('click', app.sendWhatsAppProof);
+            },
+
+            renderAll() {
+                app.renderAllProducts(); 
+                app.renderAllRecipes(); 
+                app.renderAboutPage(); 
+                app.renderContactPage();
+            },
+
+            // --- GERENCIAMENTO DE PRODUTOS ---
+            async handleProductFormSubmit(e) {
+                e.preventDefault();
+                const editId = document.getElementById('editProductId').value;
+                const productData = {
+                    name: document.getElementById('productName').value, price: parseFloat(document.getElementById('productPrice').value), description: document.getElementById('productDesc').value, img: document.getElementById('productImage').value || `https://placehold.co/400x300/CCCCCC/333?text=${document.getElementById('productName').value.replace(/ /g, '+')}`, unit: document.getElementById('productUnit').value, quantity_value: parseFloat(document.getElementById('productQuantityValue').value)
+                };
+                if (editId) {
+                    const { data, error } = await supabaseClient.from('products').update(productData).eq('id', editId);
+                    if (error) { console.error(error); app.showToast('Erro ao atualizar produto.'); } else { app.showToast('Produto atualizado!'); }
+                } else {
+                    const { data, error } = await supabaseClient.from('products').insert([productData]);
+                    if (error) { console.error(error); app.showToast('Erro ao adicionar produto.'); } else { app.showToast('Produto adicionado!'); }
+                }
+                await app.loadData(); app.renderAllProducts(); productModal.hide();
+            },
+            openProductModal(productId = null) {
+                const form = document.getElementById('product-form'); form.reset();
+                document.getElementById('editProductId').value = '';
+                if (productId) {
+                    const product = products.find(p => p.id === productId); if (!product) return;
+                    document.getElementById('productModalLabel').textContent = 'Editar Produto';
+                    document.getElementById('editProductId').value = product.id;
+                    document.getElementById('productName').value = product.name;
+                    document.getElementById('productPrice').value = product.price;
+                    document.getElementById('productImage').value = product.img;
+                    document.getElementById('productDesc').value = product.description;
+                    document.getElementById('productUnit').value = product.unit;
+                    document.getElementById('productQuantityValue').value = product.quantity_value;
+                } else { document.getElementById('productModalLabel').textContent = 'Adicionar Novo Produto'; }
+                productModal.show();
+            },
+            printProducts() {
+                try {
+                    let printHTML = `<html><head><title>Lista de Produtos - NaturaVida</title><style>body{font-family:sans-serif;margin:2rem;}table{width:100%;border-collapse:collapse;}th,td{border:1px solid #ddd;padding:8px;text-align:left;}th{background-color:#f2f2f2;}h1{text-align:center;}</style></head><body><h1>Lista de Produtos - NaturaVida</h1><table><thead><tr><th>ID</th><th>Nome do Produto</th><th>Preço (R$)</th><th>Vendido a cada</th></tr></thead><tbody>`;
+                    products.forEach(p => { printHTML += `<tr><td>${p.id}</td><td>${p.name}</td><td>${p.price.toFixed(2)}</td><td>${p.quantity_value} ${p.unit}</td></tr>`; });
+                    printHTML += `</tbody></table><p style="text-align:right;margin-top:20px;">Total de produtos: ${products.length}</p></body></html>`;
+                    const printWindow = window.open('', '_blank'); 
+                    if (!printWindow) { throw new Error("Pop-up blocked"); }
+                    printWindow.document.write(printHTML); 
+                    printWindow.document.close(); 
+                    printWindow.focus(); 
+                    printWindow.print();
+                } catch (e) {
+                    app.showToast("A janela de impressão foi bloqueada. Por favor, habilite os pop-ups para este site.");
+                }
+            },
+            renderAllProducts() {
+                const featuredContainer = document.getElementById('featured-products-container');
+                const allContainer = document.getElementById('all-products-container');
+                featuredContainer.innerHTML = ''; allContainer.innerHTML = '';
+                products.slice(0, 4).forEach(product => featuredContainer.innerHTML += app.createProductCardHTML(product));
+                products.forEach(product => allContainer.innerHTML += app.createProductCardHTML(product));
+            },
+            createProductCardHTML(product) {
+                const adminButtons = `<div class="admin-panel mt-2 pt-2 border-top d-flex justify-content-around"><button class="btn btn-sm btn-outline-primary" onclick="app.openProductModal(${product.id})"><i class="bi bi-pencil-square"></i> Editar</button><button class="btn btn-sm btn-outline-danger" onclick="app.confirmDelete('product', ${product.id})"><i class="bi bi-trash"></i> Excluir</button></div>`;
+                return `<div class="col"><div class="card h-100"><img src="${product.img}" class="card-img-top" alt="${product.name}" onerror="this.onerror=null;this.src='https://placehold.co/400x300/CCCCCC/333?text=Imagem+Inválida';"><div class="card-body d-flex flex-column"><h5 class="card-title">${product.name}</h5><p class="card-text text-muted">${product.description}</p><div class="mt-auto"><div class="text-end mb-2"><span class="fs-4 fw-bold text-dark">R$ ${product.price.toFixed(2).replace('.',',')}</span><span class="text-muted"> / ${product.quantity_value} ${product.unit}</span></div><button class="btn btn-success w-100" onclick="app.addToCart(${product.id})"><i class="bi bi-cart-plus-fill"></i> Adicionar</button>${adminButtons}</div></div></div></div>`;
+            },
+            
+            // --- GERENCIAMENTO DE RECEITAS ---
+            async handleRecipeFormSubmit(e) {
+                e.preventDefault();
+                const editId = document.getElementById('editRecipeId').value;
+                const recipeData = {
+                    name: document.getElementById('recipeName').value, img: document.getElementById('recipeImage').value || `https://placehold.co/400x300/c8e6c9/333?text=${document.getElementById('recipeName').value.replace(/ /g, '+')}`, ingredients: document.getElementById('recipeIngredients').value, instructions: document.getElementById('recipeInstructions').value
+                };
+                if (editId) {
+                    const { data, error } = await supabaseClient.from('recipes').update(recipeData).eq('id', editId);
+                    if (error) { console.error(error); app.showToast('Erro ao atualizar receita.'); } else { app.showToast('Receita atualizada!'); }
+                } else {
+                    const { data, error } = await supabaseClient.from('recipes').insert([recipeData]);
+                    if (error) { console.error(error); app.showToast('Erro ao adicionar receita.'); } else { app.showToast('Receita adicionada!'); }
+                }
+                await app.loadData(); app.renderAllRecipes(); recipeModal.hide();
+            },
+            openRecipeModal(recipeId = null) {
+                const form = document.getElementById('recipe-form'); form.reset();
+                document.getElementById('editRecipeId').value = '';
+                if (recipeId) {
+                    const recipe = recipes.find(r => r.id === recipeId); if (!recipe) return;
+                    document.getElementById('recipeModalLabel').textContent = 'Editar Receita';
+                    document.getElementById('editRecipeId').value = recipe.id;
+                    document.getElementById('recipeName').value = recipe.name;
+                    document.getElementById('recipeImage').value = recipe.img;
+                    document.getElementById('recipeIngredients').value = recipe.ingredients;
+                    document.getElementById('recipeInstructions').value = recipe.instructions;
+                } else { document.getElementById('recipeModalLabel').textContent = 'Adicionar Nova Receita'; }
+                recipeModal.show();
+            },
+            viewRecipe(recipeId) {
+                const recipe = recipes.find(r => r.id === recipeId); if (!recipe) return;
+                document.getElementById('viewRecipeModalLabel').textContent = recipe.name;
+                const ingredientsHTML = `<h5>Ingredientes</h5><ul>${recipe.ingredients.split('\n').map(item => `<li>${item}</li>`).join('')}</ul>`;
+                const instructionsHTML = `<h5>Modo de Preparo</h5><ol>${recipe.instructions.split('\n').map(item => `<li>${item}</li>`).join('')}</ol>`;
+                document.getElementById('viewRecipeModalBody').innerHTML = `<img src="${recipe.img}" class="img-fluid rounded mb-3" alt="${recipe.name}"><div class="recipe-content">${ingredientsHTML}${instructionsHTML}</div>`;
+                viewRecipeModal.show();
+            },
+            renderAllRecipes() {
+                const container = document.getElementById('all-recipes-container'); container.innerHTML = '';
+                recipes.forEach(recipe => container.innerHTML += app.createRecipeCardHTML(recipe));
+            },
+            createRecipeCardHTML(recipe) {
+                const adminButtons = `<div class="admin-panel mt-2 pt-2 border-top d-flex justify-content-around"><button class="btn btn-sm btn-outline-primary" onclick="app.openRecipeModal(${recipe.id})"><i class="bi bi-pencil-square"></i> Editar</button><button class="btn btn-sm btn-outline-danger" onclick="app.confirmDelete('recipe', ${recipe.id})"><i class="bi bi-trash"></i> Excluir</button></div>`;
+                return `<div class="col"><div class="card h-100"><img src="${recipe.img}" class="card-img-top" alt="${recipe.name}" onerror="this.onerror=null;this.src='https://placehold.co/400x300/CCCCCC/333?text=Imagem+Inválida';"><div class="card-body d-flex flex-column"><h5 class="card-title">${recipe.name}</h5><div class="mt-auto"><button class="btn btn-outline-success w-100" onclick="app.viewRecipe(${recipe.id})">Ver Receita</button>${adminButtons}</div></div></div></div>`;
+            },
+
+            // --- GERENCIAMENTO DE CONTEÚDO ---
+            async handleContactFormSubmit(e) {
+                e.preventDefault();
+                contactInfo.email = document.getElementById('contact-email').value;
+                contactInfo.phone = document.getElementById('contact-phone').value;
+                contactInfo.whatsapp = document.getElementById('contact-whatsapp').value;
+                contactInfo.address = document.getElementById('contact-address').value;
+                contactInfo.whatsappCheckout = document.getElementById('contact-whatsapp-checkout').value;
+                contactInfo.pixQrCode = document.getElementById('contact-pix-qrcode').value;
+                contactInfo.pixKey = document.getElementById('contact-pix-key').value;
+                await app.saveSiteContent(); app.renderContactPage(); app.showToast('Informações de contato salvas!');
+            },
+            async saveAboutContent() {
+                aboutContent = document.getElementById('about-editor').value;
+                await app.saveSiteContent(); app.renderAboutPage(); app.showToast('Página "Sobre Nós" salva!');
+            },
+            renderAboutPage() {
+                document.getElementById('about-content').textContent = aboutContent;
+                document.getElementById('about-editor').value = aboutContent;
+            },
+            renderContactPage() {
+                const display = document.getElementById('contact-info-display');
+                display.innerHTML = `
+                    ${contactInfo.email ? `<p><i class="bi bi-envelope-fill me-2"></i>${contactInfo.email}</p>` : ''}
+                    ${contactInfo.phone ? `<p><i class="bi bi-telephone-fill me-2"></i>${contactInfo.phone}</p>` : ''}
+                    ${contactInfo.whatsapp ? `<p><i class="bi bi-whatsapp me-2"></i>${contactInfo.whatsapp}</p>` : ''}
+                    ${contactInfo.address ? `<p><i class="bi bi-geo-alt-fill me-2"></i>${contactInfo.address}</p>` : ''}
+                `;
+                document.getElementById('contact-email').value = contactInfo.email || '';
+                document.getElementById('contact-phone').value = contactInfo.phone || '';
+                document.getElementById('contact-whatsapp').value = contactInfo.whatsapp || '';
+                document.getElementById('contact-address').value = contactInfo.address || '';
+                document.getElementById('contact-whatsapp-checkout').value = contactInfo.whatsappCheckout || '';
+                document.getElementById('contact-pix-qrcode').value = contactInfo.pixQrCode || '';
+                document.getElementById('contact-pix-key').value = contactInfo.pixKey || '';
+            },
+
+            // --- GERENCIAMENTO DO CARRINHO ---
+            addToCart(productId) {
+                const product = products.find(p => p.id === productId);
+                if (!product) return;
+                if (['gr', 'kg', 'ml', 'l'].includes(product.unit)) {
+                    app.openQuantityModal(productId);
+                } else {
+                    const existingProduct = cart.find(item => item.id === productId && item.type === 'unit');
+                    if (existingProduct) {
+                        existingProduct.quantity++;
+                    } else {
+                        cart.push({ ...product, quantity: 1, type: 'unit' });
+                    }
+                    app.updateAndSaveCart();
+                    app.showToast(`${product.name} foi adicionado ao carrinho!`);
+                }
+            },
+            openQuantityModal(productId) {
+                const product = products.find(p => p.id === productId);
+                if (!product) return;
+                document.getElementById('quantityProductId').value = productId;
+                document.getElementById('quantityProductName').textContent = product.name;
+                document.getElementById('quantityProductPriceInfo').textContent = `Preço: R$ ${product.price.toFixed(2).replace('.',',')} / ${product.quantity_value} ${product.unit}`;
+                const quantityInput = document.getElementById('product-quantity');
+                const subtotalSpan = document.getElementById('quantitySubtotal');
+                const unitLabel = document.getElementById('quantityUnitLabel');
+                const modalLabel = document.getElementById('quantityModalLabel');
+                const inputLabel = document.getElementById('quantityInputLabel');
+                const isWeight = ['gr', 'kg'].includes(product.unit);
+                const baseUnit = isWeight ? 'gr' : 'ml';
+                const baseUnitLabel = isWeight ? 'gramas' : 'ml';
+                
+                modalLabel.textContent = `Adicionar ${isWeight ? 'Produto a Granel' : 'Produto Líquido'}`;
+                inputLabel.textContent = `Digite a quantidade desejada (em ${baseUnitLabel}):`;
+                unitLabel.textContent = baseUnit;
+                
+                const calculateSubtotal = () => {
+                    const quantity = parseFloat(quantityInput.value) || 0;
+                    let pricePerBaseUnit;
+                    if (product.unit === 'kg' || product.unit === 'l') {
+                        pricePerBaseUnit = product.price / (product.quantity_value * 1000);
+                    } else {
+                        pricePerBaseUnit = product.price / product.quantity_value;
+                    }
+                    const subtotal = quantity * pricePerBaseUnit;
+                    subtotalSpan.textContent = `R$ ${subtotal.toFixed(2).replace('.', ',')}`;
+                };
+                quantityInput.oninput = calculateSubtotal;
+                quantityInput.value = isWeight ? 100 : 250;
+                calculateSubtotal();
+                quantityModal.show();
+            },
+            handleQuantityFormSubmit(e) {
+                e.preventDefault();
+                const productId = parseInt(document.getElementById('quantityProductId').value, 10);
+                const quantity = parseFloat(document.getElementById('product-quantity').value);
+                const product = products.find(p => p.id === productId);
+                if (!product || !quantity || quantity <= 0) {
+                    app.showToast("Por favor, insira uma quantidade válida.");
+                    return;
+                }
+                const isWeight = ['gr', 'kg'].includes(product.unit);
+                const type = isWeight ? 'weight' : 'volume';
+                const purchasedUnit = isWeight ? 'gr' : 'ml';
+                
+                cart = cart.filter(item => !(item.id === productId && (item.type === 'weight' || item.type === 'volume')));
+                let pricePerBaseUnit;
+                if (product.unit === 'kg' || product.unit === 'l') {
+                    pricePerBaseUnit = product.price / (product.quantity_value * 1000);
+                } else {
+                    pricePerBaseUnit = product.price / product.quantity_value;
+                }
+                const subtotal = quantity * pricePerBaseUnit;
+                cart.push({
+                    ...product,
+                    type: type,
+                    purchasedQuantity: quantity,
+                    purchasedUnit: purchasedUnit,
+                    subtotal: subtotal
+                });
+                app.updateAndSaveCart();
+                app.showToast(`${quantity}${purchasedUnit} de ${product.name} adicionado(s) ao carrinho!`);
+                quantityModal.hide();
+            },
+            updateQuantity(cartItemId, change) {
+                const item = cart.find(i => i.cartItemId === cartItemId);
+                if (item && item.type === 'unit') {
+                    item.quantity += change;
+                    if (item.quantity <= 0) {
+                        app.removeFromCart(cartItemId);
+                    } else {
+                        app.updateAndSaveCart();
+                    }
+                }
+            },
+            removeFromCart(cartItemId) {
+                cart = cart.filter(item => item.cartItemId !== cartItemId);
+                app.updateAndSaveCart();
+            },
+            updateAndSaveCart() { 
+                cart.forEach((item, index) => item.cartItemId = index);
+                app.renderCartPage(); 
+                app.updateCartBadge(); 
+                localStorage.setItem('naturaVidaCart', JSON.stringify(cart)); 
+            },
+            updateCartBadge() {
+                const totalItems = cart.length;
+                document.getElementById('cart-badge').textContent = totalItems;
+            },
+            renderCartPage() {
+                const container = document.getElementById('cart-items-container');
+                if (cart.length === 0) { container.innerHTML = '<div class="text-center"><i class="bi bi-cart-x" style="font-size: 4rem; color: #ccc;"></i><p class="lead text-muted mt-3">Seu carrinho está vazio.</p></div>'; return; }
+                let total = 0; let cartHTML = '<ul class="list-group mb-3">';
+                cart.forEach(item => {
+                    if (item.type === 'unit') {
+                        const subtotal = item.price * item.quantity; total += subtotal;
+                        cartHTML += `<li class="list-group-item d-flex justify-content-between align-items-center"><div><h6 class="my-0">${item.name}</h6><small class="text-muted">R$ ${item.price.toFixed(2).replace('.',',')} / ${item.quantity_value} ${item.unit}</small></div><div class="d-flex align-items-center"><div class="quantity-controls me-3"><button class="btn btn-sm btn-outline-secondary" onclick="app.updateQuantity(${item.cartItemId}, -1)">-</button><span class="mx-2">${item.quantity}</span><button class="btn btn-sm btn-outline-secondary" onclick="app.updateQuantity(${item.cartItemId}, 1)">+</button></div><span class="text-muted me-3">R$ ${subtotal.toFixed(2).replace('.',',')}</span><button class="btn btn-sm btn-outline-danger" onclick="app.removeFromCart(${item.cartItemId})"><i class="bi bi-trash-fill"></i></button></div></li>`;
+                    } else if (item.type === 'weight' || item.type === 'volume') {
+                        total += item.subtotal;
+                        cartHTML += `<li class="list-group-item d-flex justify-content-between align-items-center"><div><h6 class="my-0">${item.purchasedQuantity}${item.purchasedUnit} de ${item.name}</h6><small class="text-muted">Produto ${item.type === 'weight' ? 'a granel' : 'líquido'}</small></div><div class="d-flex align-items-center"><span class="text-muted me-3">R$ ${item.subtotal.toFixed(2).replace('.',',')}</span><button class="btn btn-sm btn-outline-danger" onclick="app.removeFromCart(${item.cartItemId})"><i class="bi bi-trash-fill"></i></button></div></li>`;
+                    }
+                });
+                cartHTML += `<li class="list-group-item d-flex justify-content-between bg-light"><strong class="fs-5">Total</strong><strong class="fs-5">R$ ${total.toFixed(2).replace('.',',')}</strong></li></ul><div class="text-end"><button class="btn btn-success btn-lg" id="checkout-btn">Finalizar Compra</button></div>`;
+                container.innerHTML = cartHTML;
+                 document.getElementById('checkout-btn').addEventListener('click', app.checkoutViaWhatsApp);
+            },
+            
+            // --- CHECKOUT VIA WHATSAPP ---
+            checkoutViaWhatsApp() {
+                if (cart.length === 0) { app.showToast("Seu carrinho está vazio!"); return; }
+                const checkoutNumber = contactInfo.whatsappCheckout || '';
+                if (!checkoutNumber) { app.showToast("O número de WhatsApp para pedidos não foi configurado."); return; }
+
+                let total = 0;
+                let message = "Olá! Gostaria de fazer o seguinte pedido:\n\n";
+                cart.forEach(item => {
+                    if(item.type === 'unit') {
+                        const subtotal = item.price * item.quantity; 
+                        total += subtotal;
+                        message += `*${item.quantity}x* ${item.name} - R$ ${subtotal.toFixed(2).replace('.',',')}\n`;
+                    } else {
+                        total += item.subtotal;
+                        message += `*${item.purchasedQuantity}${item.purchasedUnit}* de ${item.name} - R$ ${item.subtotal.toFixed(2).replace('.',',')}\n`;
+                    }
+                });
+                message += `\n*Total do Pedido: R$ ${total.toFixed(2).replace('.',',')}*`;
+                message += `\n\nPara pagar, você pode usar uma das opções abaixo:\n`;
+                if (contactInfo.pixKey) {
+                    message += `\n*Pix Copia e Cola:*\n\`\`\`${contactInfo.pixKey}\`\`\`\n`;
+                }
+                if (contactInfo.pixQrCode) {
+                    message += `\n*QR Code Pix:*\n${contactInfo.pixQrCode}\n`;
+                }
+                message += `\nApós o pagamento, por favor, envie o comprovante aqui.`;
+
+                const whatsappUrl = `https://wa.me/${checkoutNumber.replace(/\D/g, '')}?text=${encodeURIComponent(message)}`;
+                window.open(whatsappUrl, '_blank');
+            },
+
+            // --- PERSISTÊNCIA DE DADOS (SUPABASE) ---
+            async loadData() {
+                const { data: productsData, error: productsError } = await supabaseClient.from('products').select('*');
+                if (productsError) { console.error('Erro ao buscar produtos:', productsError); } else { products = productsData; }
+
+                const { data: recipesData, error: recipesError } = await supabaseClient.from('recipes').select('*');
+                if (recipesError) { console.error('Erro ao buscar receitas:', recipesError); } else { recipes = recipesData; }
+
+                const { data: contentData, error: contentError } = await supabaseClient.from('site_content').select('*').eq('id', 1).single();
+                if (contentError) { console.error('Erro ao buscar conteúdo do site:', contentError); } else {
+                    aboutContent = contentData.about_content || '';
+                    contactInfo = contentData.contact_info || {};
+                }
+                cart = JSON.parse(localStorage.getItem('naturaVidaCart')) || [];
+            },
+            async saveSiteContent() {
+                const { data, error } = await supabaseClient.from('site_content').update({
+                    about_content: aboutContent,
+                    contact_info: contactInfo
+                }).eq('id', 1);
+                if (error) { console.error('Erro ao salvar conteúdo do site:', error); app.showToast('Erro ao salvar conteúdo.'); }
+            },
+
+            // --- GERENCIAMENTO GERAL ---
+            showPage(pageId, clickedElement) {
+                document.querySelectorAll('.page-content').forEach(page => page.style.display = 'none');
+                document.getElementById(`page-${pageId}`).style.display = 'block';
+                document.querySelectorAll('.nav-link').forEach(link => link.classList.remove('active'));
+                if (clickedElement && clickedElement.classList.contains('nav-link')) { clickedElement.classList.add('active'); }
+            },
+            async confirmDelete(type, id) {
+                const deleteModal = new bootstrap.Modal(document.getElementById('deleteConfirmModal'));
+                document.getElementById('deleteConfirmModalLabel').textContent = `Confirmar Exclusão de ${type === 'product' ? 'Produto' : 'Receita'}`;
+                document.getElementById('deleteConfirmModalBody').textContent = `Tem certeza de que deseja excluir est${type === 'product' ? 'e produto' : 'a receita'}? Esta ação não pode ser desfeita.`;
+                document.getElementById('confirmDeleteBtn').onclick = async () => {
+                    const tableName = type === 'product' ? 'products' : 'recipes';
+                    const { data, error } = await supabaseClient.from(tableName).delete().eq('id', id);
+
+                    if (error) {
+                        console.error(`Erro ao excluir ${type}:`, error);
+                        app.showToast(`Erro ao excluir ${type}.`);
+                    } else {
+                        app.showToast(`${type === 'product' ? 'Produto' : 'Receita'} excluíd${type === 'product' ? 'o' : 'a'} com sucesso!`);
+                        await app.loadData();
+                        if (type === 'product') app.renderAllProducts(); else app.renderAllRecipes();
+                    }
+                    deleteModal.hide();
+                };
+                deleteModal.show();
+            },
+            
+            // --- GERENCIAMENTO DO MODO ADMIN COM SENHA ---
+            handleAdminModeClick() {
+                if (document.body.classList.contains('admin-mode')) {
+                    app.toggleAdminMode(false);
+                } else {
+                    passwordModal.show();
+                }
+            },
+            handlePasswordFormSubmit(e) {
+                e.preventDefault();
+                const passwordInput = document.getElementById('admin-password');
+                if (passwordInput.value === ADMIN_PASSWORD) {
+                    app.toggleAdminMode(true);
+                    passwordModal.hide();
+                    passwordInput.value = '';
+                } else {
+                    app.showToast('Senha incorreta!');
+                    passwordInput.value = '';
+                }
+            },
+            toggleAdminMode(isAdmin) {
+                document.body.classList.toggle('admin-mode', isAdmin);
+                localStorage.setItem('isAdminMode', isAdmin);
+                app.updateAdminButtonState(isAdmin);
+                app.renderAllProducts(); app.renderAllRecipes(); app.renderAboutPage(); app.renderContactPage();
+            },
+            updateAdminButtonState(isAdmin) {
+                const btn = document.getElementById('admin-mode-btn');
+                if (isAdmin) { btn.innerHTML = '<i class="bi bi-unlock-fill"></i> Sair do Modo Admin'; btn.classList.replace('btn-outline-secondary', 'btn-danger'); } 
+                else { btn.innerHTML = '<i class="bi bi-shield-lock-fill"></i> Acessar Modo Admin'; btn.classList.replace('btn-danger', 'btn-outline-secondary'); }
+            },
+            checkAdminMode() {
+                app.toggleAdminMode(false); // Sempre começa deslogado do modo admin
+            },
+            
+            // --- GERENCIAMENTO DE AUTENTICAÇÃO DO CLIENTE (SUPABASE) ---
+            async signInWithGoogle() {
+                const { user, session, error } = await supabaseClient.auth.signInWithOAuth({
+                    provider: 'google',
+                });
+                if (error) {
+                    console.error("Erro no login com Google:", error);
+                    app.showToast("Erro ao tentar fazer login. Verifique as configurações do Supabase.");
+                }
+            },
+            async signOut() {
+                const { error } = await supabaseClient.auth.signOut();
+                if (error) {
+                    console.error("Erro ao fazer logout:", error);
+                    app.showToast("Erro ao tentar sair.");
+                }
+            },
+            setupAuthObserver() {
+                supabaseClient.auth.onAuthStateChange((event, session) => {
+                    const user = session?.user;
+                    const loginButton = document.getElementById('login-button');
+                    const userInfo = document.getElementById('user-info');
+
+                    if (user) { // Usuário está logado
+                        loginButton.classList.add('d-none');
+                        userInfo.classList.remove('d-none');
+                        userInfo.classList.add('d-flex');
+                        document.getElementById('user-photo').src = user.user_metadata.avatar_url;
+                    } else { // Usuário não está logado
+                        loginButton.classList.remove('d-none');
+                        userInfo.classList.add('d-none');
+                        userInfo.classList.remove('d-flex');
+                    }
+                });
+            },
+            
+            showToast(message) {
+                const toastLiveExample = document.getElementById('liveToast');
+                document.getElementById('toast-body-message').textContent = message;
+                const toast = new bootstrap.Toast(toastLiveExample); toast.show();
+            }
+        };
+        
+        document.addEventListener('DOMContentLoaded', () => {
+            if (SUPABASE_URL === 'SUA_URL_AQUI' || SUPABASE_ANON_KEY === 'SUA_CHAVE_ANON_AQUI') {
+                app.showToast('ATENÇÃO: Supabase não configurado. Os dados não serão salvos.');
+            } else {
+                supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+                app.init();
+            }
+        });
+    </script>
+</body>
+</html>
+
